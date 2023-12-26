@@ -51,7 +51,7 @@ func (l *logger) header(funcName, file string, line int) string {
 	l.lastFunc = funcName
 	l.lastFile = file
 
-	return fmt.Sprintf("[%s %s:%d %s]", now.Format("15:04:05"), shortFile(file), line, funcName)
+	return fmt.Sprintf("[%s %s:%d %s]", now.Format("2006-01-02T15:04:05.000"), shortFile(file), line, funcName)
 }
 
 func (l *logger) shouldPrintHeader(funcName, file string) bool {
