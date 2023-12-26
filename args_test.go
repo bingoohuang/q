@@ -378,7 +378,7 @@ func TestExtractingArgsFromSourceText(t *testing.T) {
 // sample text and extract the argument names. For example, if q.q(a, b, c) is
 // in the sample text, argNames() should return []string{"a", "b", "c"}.
 func TestArgNames(t *testing.T) {
-	const filename = "testdata/sample1.go"
+	const filename = "cmd/q/main.go"
 	want := []string{"a", "b", "c", "d", "e", "f", "g"}
 	got, err := argNames(filename, 14)
 	if err != nil {
