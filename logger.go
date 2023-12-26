@@ -30,12 +30,12 @@ const (
 // logger writes pretty logs to the $TMPDIR/q file. It takes care of opening and
 // closing the file. It is safe for concurrent use.
 type logger struct {
-	mu        sync.Mutex   // protects all the other fields
-	buf       bytes.Buffer // collects writes before they're flushed to the log file
 	start     time.Time    // time of first write in the current log group
 	lastWrite time.Time    // last time buffer was flushed. determines when to print header
 	lastFile  string       // last file to call q.Q(). determines when to print header
 	lastFunc  string       // last function to call q.Q(). determines when to print header
+	buf       bytes.Buffer // collects writes before they're flushed to the log file
+	mu        sync.Mutex   // protects all the other fields
 }
 
 // header returns a formatted header string, e.g. [14:00:36 main.go main.main:122]
@@ -46,7 +46,7 @@ func (l *logger) header(funcName, file string, line int) string {
 		return ""
 	}
 
-	now := time.Now().UTC()
+	now := time.Now()
 	l.start = now
 	l.lastFunc = funcName
 	l.lastFile = file
@@ -73,10 +73,12 @@ func (l *logger) shouldPrintHeader(funcName, file string) bool {
 // flush writes the logger's buffer to disk.
 func (l *logger) flush() (err error) {
 	path := filepath.Join(os.TempDir(), "q")
-	f, err := os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o600)
+	const mode = 0o666
+	f, err := os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_WRONLY, mode)
 	if err != nil {
 		return fmt.Errorf("failed to open %q: %w", path, err)
 	}
+	os.Chmod(path, mode)
 	defer func() {
 		if cerr := f.Close(); err == nil {
 			err = cerr

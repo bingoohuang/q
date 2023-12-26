@@ -42,7 +42,6 @@ func Q(v ...interface{}) {
 	funcName, file, line, err := getCallerInfo()
 	if err != nil {
 		std.output(args...) // no name=value printing
-
 		return
 	}
 
@@ -58,7 +57,6 @@ func Q(v ...interface{}) {
 	names, err := argNames(file, line)
 	if err != nil {
 		std.output(args...) // no name=value printing
-
 		return
 	}
 

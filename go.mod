@@ -1,4 +1,4 @@
-module github.com/ryboe/q
+module github.com/bingoohuang/q
 
 go 1.21
 

@@ -1,7 +1,7 @@
 # q
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/ryboe/q)](https://goreportcard.com/report/github.com/ryboe/q)
-[![PkgGoDev](https://pkg.go.dev/badge/github.com/ryboe/q)](https://pkg.go.dev/github.com/ryboe/q)
+[![Go Report Card](https://goreportcard.com/badge/github.com/bingoohuang/q)](https://goreportcard.com/report/github.com/bingoohuang/q)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/bingoohuang/q)](https://pkg.go.dev/github.com/bingoohuang/q)
 
 q is a better way to do print statement debugging.
 
@@ -30,7 +30,7 @@ For best results, dedicate a terminal to tailing `$TMPDIR/q` while you work.
 ## Install
 
 ```sh
-git clone https://github.com/ryboe/q "$(go env GOPATH)"/src/q
+git clone https://github.com/bingoohuang/q "$(go env GOPATH)"/src/q
 ```
 
 Put these functions in your shell config. Typing `qq` or `rmqq` will then start
