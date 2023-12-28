@@ -7,7 +7,6 @@ package q
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -76,26 +75,56 @@ func (l *logger) shouldPrintHeader(funcName, file string) bool {
 // flush writes the logger's buffer to disk.
 func (l *logger) flush() (err error) {
 	path := filepath.Join(os.TempDir(), "q")
-	const mode = 0o666
-	f, err := os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_WRONLY, mode)
-	if err != nil {
-		return fmt.Errorf("failed to open %q: %w", path, err)
-	}
-	os.Chmod(path, mode)
-	defer func() {
-		if cerr := f.Close(); err == nil {
-			err = cerr
-		}
-		l.lastWrite = time.Now()
-	}()
-
-	_, err = io.Copy(f, &l.buf)
+	err = AppendFile(path, l.buf.Bytes(), 0o666)
+	l.lastWrite = time.Now()
 	l.buf.Reset()
 	if err != nil {
 		return fmt.Errorf("failed to flush q buffer: %w", err)
 	}
 
 	return nil
+}
+
+// AppendFile appends data to a file.
+func AppendFile(name string, data []byte, mode os.FileMode) error {
+	f, err := os.OpenFile(name, os.O_CREATE|os.O_APPEND|os.O_WRONLY, mode)
+	if err != nil {
+		return fmt.Errorf("failed to open %q: %w", name, err)
+	}
+	err1 := os.Chmod(name, mode)
+	_, err2 := f.Write(data)
+	err3 := f.Close()
+
+	return MergeErrors(err1, err2, err3)
+}
+
+// MultiError represents an error that aggregates multiple errors.
+type MultiError []error
+
+// Error implements the error interface for MultiError.
+func (m MultiError) Error() string {
+	var errorStrings []string
+	for _, err := range m {
+		errorStrings = append(errorStrings, err.Error())
+	}
+	return strings.Join(errorStrings, "; ")
+}
+
+// MergeErrors merges multiple errors into a single error.
+func MergeErrors(errors ...error) error {
+	var nonNilErrors []error
+
+	for _, err := range errors {
+		if err != nil {
+			nonNilErrors = append(nonNilErrors, err)
+		}
+	}
+
+	if len(nonNilErrors) == 0 {
+		return nil
+	}
+
+	return MultiError(nonNilErrors)
 }
 
 // output writes to the log buffer. Each log message is prepended with a
