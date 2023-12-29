@@ -8,7 +8,9 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"os/user"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -72,9 +74,18 @@ func (l *logger) shouldPrintHeader(funcName, file string) bool {
 	return time.Since(l.lastWrite) > timeWindow
 }
 
+var path = func() string {
+	uid := os.Getuid()
+	str := strconv.Itoa(uid)
+	if u, _ := user.LookupId(str); u != nil {
+		return filepath.Join(os.TempDir(), u.Username+".q")
+	}
+
+	return filepath.Join(os.TempDir(), "q")
+}()
+
 // flush writes the logger's buffer to disk.
 func (l *logger) flush() (err error) {
-	path := filepath.Join(os.TempDir(), "q")
 	err = AppendFile(path, l.buf.Bytes(), 0o666)
 	l.lastWrite = time.Now()
 	l.buf.Reset()
@@ -92,8 +103,17 @@ func AppendFile(name string, data []byte, mode os.FileMode) error {
 		return fmt.Errorf("failed to open %q: %w", name, err)
 	}
 	err1 := os.Chmod(name, mode)
+	if err1 != nil {
+		err1 = fmt.Errorf("chmod %s to mod %s: %w", name, mode, err)
+	}
 	_, err2 := f.Write(data)
+	if err2 != nil {
+		err2 = fmt.Errorf("write %s: %w", name, err2)
+	}
 	err3 := f.Close()
+	if err3 != nil {
+		err3 = fmt.Errorf("close %s: %w", name, err3)
+	}
 
 	return MergeErrors(err1, err2, err3)
 }
