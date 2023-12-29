@@ -11,7 +11,7 @@ Type `q.Q` instead of `fmt.Printf` and your variables will be printed like this:
 * Faster to type
 * Pretty-printed vars and expressions
 * Easier to see inside structs
-* Doesn't go to noisy-ass stdout. It goes to `$TMPDIR/$USER/q`.
+* Doesn't go to noisy-ass stdout. It goes to `$TMPDIR/$USER.q`.
 * Pretty colors!
 
 ## Basic Usage
@@ -22,20 +22,20 @@ import "q"
 q.Q(a, b, c)
 ```
 
-For best results, dedicate a terminal to tailing `$TMPDIR/$USER/q` while you work.
+For best results, dedicate a terminal to tailing `$TMPDIR/$USER.q` while you work.
 
 ## Install
 
 `git get  github.com/bingoohuang/q@latest`
 
 Put these functions in your shell config. Typing `qq` or `rmqq` will then start
-tailing `$TMPDIR/$USER/q`.
+tailing `$TMPDIR/$USER.q`.
 
 ```sh
 qq() {
     clear
 
-    logpath="$TMPDIR/$USER/q"
+    logpath="$TMPDIR/$USER.q"
     if [[ -z "$TMPDIR" ]]; then
         logpath="/tmp/q"
     fi
@@ -48,7 +48,7 @@ qq() {
 }
 
 rmqq() {
-    logpath="$TMPDIR/$USER/q"
+    logpath="$TMPDIR/$USER.q"
     if [[ -z "$TMPDIR" ]]; then
         logpath="/tmp/q"
     fi
@@ -59,7 +59,7 @@ rmqq() {
 }
 ```
 
-You also can simply `tail -f $TMPDIR/$USER/q`, but it's highly recommended to use the above commands.
+You also can simply `tail -f $TMPDIR/$USER.q`, but it's highly recommended to use the above commands.
 
 ## Haven't I seen this somewhere before?
 

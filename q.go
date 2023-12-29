@@ -29,14 +29,14 @@ var (
 	envQ = os.Getenv("Q") == "1"
 )
 
-// D pretty-prints the given arguments to the $TMPDIR/$USER/q log file when export Q=1
+// D pretty-prints the given arguments to the $TMPDIR/$USER.q log file when export Q=1
 func D(v ...interface{}) {
 	if envQ {
 		q(CallDepth, v...)
 	}
 }
 
-// Q pretty-prints the given arguments to the $TMPDIR/$USER/q log file.
+// Q pretty-prints the given arguments to the $TMPDIR/$USER.q log file.
 func Q(v ...interface{}) {
 	q(CallDepth, v...)
 }
