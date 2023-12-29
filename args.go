@@ -5,7 +5,6 @@
 package q
 
 import (
-	"errors"
 	"fmt"
 	"go/ast"
 	"go/parser"
@@ -15,7 +14,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/kr/pretty"
+	"github.com/bingoohuang/q/pretty"
 )
 
 // argName returns the source text of the given argument if it's a variable or
@@ -138,16 +137,13 @@ func formatArgs(args ...interface{}) []string {
 	return formatted
 }
 
-// getCallerInfo returns the name, file, and line number of the function calling
-// q.Q().
-func getCallerInfo() (funcName, file string, line int, err error) {
-	pc, file, line, ok := runtime.Caller(CallDepth)
+// getCallerInfo returns the name, file, and line of the function calling q.Q().
+func getCallerInfo(callDepth int) (funcName, file string, line int, err error) {
+	pc, file, line, ok := runtime.Caller(callDepth)
 	if !ok {
 		// This error is not exported. It is only used internally in the q
-		// package. The error message isn't even used by the caller. So, I've
-		// suppressed the goerr113 linter here, which catches nonidiomatic
-		// error handling post Go 1.13 errors.
-		return "", "", 0, errors.New("failed to get info about the function calling q.Q") // nolint: goerr113
+		// package. The error message isn't even used by the caller.
+		return "", "", 0, fmt.Errorf("get caller !ok") // nolint: goerr113
 	}
 
 	funcName = runtime.FuncForPC(pc).Name()

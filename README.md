@@ -1,8 +1,5 @@
 # q
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/bingoohuang/q)](https://goreportcard.com/report/github.com/bingoohuang/q)
-[![PkgGoDev](https://pkg.go.dev/badge/github.com/bingoohuang/q)](https://pkg.go.dev/github.com/bingoohuang/q)
-
 q is a better way to do print statement debugging.
 
 Type `q.Q` instead of `fmt.Printf` and your variables will be printed like this:
@@ -14,7 +11,7 @@ Type `q.Q` instead of `fmt.Printf` and your variables will be printed like this:
 * Faster to type
 * Pretty-printed vars and expressions
 * Easier to see inside structs
-* Doesn't go to noisy-ass stdout. It goes to `$TMPDIR/q`.
+* Doesn't go to noisy-ass stdout. It goes to `$TMPDIR/$USER/q`.
 * Pretty colors!
 
 ## Basic Usage
@@ -25,22 +22,20 @@ import "q"
 q.Q(a, b, c)
 ```
 
-For best results, dedicate a terminal to tailing `$TMPDIR/q` while you work.
+For best results, dedicate a terminal to tailing `$TMPDIR/$USER/q` while you work.
 
 ## Install
 
-```sh
-git clone https://github.com/bingoohuang/q "$(go env GOPATH)"/src/q
-```
+`git get  github.com/bingoohuang/q@latest`
 
 Put these functions in your shell config. Typing `qq` or `rmqq` will then start
-tailing `$TMPDIR/q`.
+tailing `$TMPDIR/$USER/q`.
 
 ```sh
 qq() {
     clear
 
-    logpath="$TMPDIR/q"
+    logpath="$TMPDIR/$USER/q"
     if [[ -z "$TMPDIR" ]]; then
         logpath="/tmp/q"
     fi
@@ -53,7 +48,7 @@ qq() {
 }
 
 rmqq() {
-    logpath="$TMPDIR/q"
+    logpath="$TMPDIR/$USER/q"
     if [[ -z "$TMPDIR" ]]; then
         logpath="/tmp/q"
     fi
@@ -64,87 +59,12 @@ rmqq() {
 }
 ```
 
-You also can simply `tail -f $TMPDIR/q`, but it's highly recommended to use the above commands.
-
-## Editor Integration
-
-### VS Code
-
-`Preferences > User Snippets > Go`
-
-```json
-"qq": {
-    "prefix": "qq",
-    "body": "q.Q($1) // DEBUG",
-    "description": "Pretty-print to $TMPDIR/q"
-}
-```
-
-### Sublime Text
-
-`Tools > Developer > New Snippet`
-
-```xml
-<snippet>
-    <content><![CDATA[
-q.Q($1) // DEBUG
-]]></content>
-    <tabTrigger>qq</tabTrigger>
-    <scope>source.go</scope>
-</snippet>
-```
-
-### Atom
-
-`Atom > Open Your Snippets`
-
-```coffee
-'.source.go':
-    'qq':
-        'prefix': 'qq'
-        'body': 'q.Q($1) // DEBUG'
-```
-
-### JetBrains GoLand
-
-`Settings > Editor > Live Templates`
-
-In `Go`, add a new template with:
-
-* Abbreviation: `qq`
-* Description: `Pretty-print to $TMPDIR/q`
-* Template text: `q.Q($END$) // DEBUG`
-* Applicable in: select the `Go` scope
-
-### Emacs
-
-Add a new snippet file to the go-mode snippets directory
-(`$HOME/.emacs.d/snippets/go-mode/qq`). This should
-contain:
-
-```emacs
-# -*- mode: snippet -*-
-# name: qq
-# key: qq
-# --
-q.Q(${1:...}) // DEBUG
-```
-
-### Vim/NeoVim
-
-For [SirVer/ultisnips](https://github.com/SirVer/ultisnips), use `:UltiSnipsEdit` to add the new snippet:
-
-```snippets
-snippet qq "qq"
-q.Q(${1:})
-${2}
-endsnippet
-```
+You also can simply `tail -f $TMPDIR/$USER/q`, but it's highly recommended to use the above commands.
 
 ## Haven't I seen this somewhere before?
 
-Python programmers will recognize this as a Golang port of the
-[`q` module by zestyping](https://github.com/zestyping/q).
+Python programmers will recognize this as a Golang port of
+the [`q` module by zestyping](https://github.com/zestyping/q).
 
 Ping does a great job of explaining `q` in his awesome lightning talk from
 PyCon 2013. Watch it! It's funny :)

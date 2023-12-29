@@ -6,6 +6,7 @@ package q
 
 import (
 	"fmt"
+	"os"
 )
 
 // nolint: gochecknoglobals
@@ -23,11 +24,24 @@ var (
 	// This also allows the consumer of the package to control what happens
 	// with leftover `q.Q` calls. Defaults to 2, because the user code calls
 	// q.Q(), which calls getCallerInfo().
-	CallDepth = 2
+	CallDepth = 3
+
+	envQ = os.Getenv("Q") == "1"
 )
 
-// Q pretty-prints the given arguments to the $TMPDIR/q log file.
+// D pretty-prints the given arguments to the $TMPDIR/$USER/q log file when export Q=1
+func D(v ...interface{}) {
+	if envQ {
+		q(CallDepth, v...)
+	}
+}
+
+// Q pretty-prints the given arguments to the $TMPDIR/$USER/q log file.
 func Q(v ...interface{}) {
+	q(CallDepth, v...)
+}
+
+func q(callDepth int, v ...interface{}) {
 	std.mu.Lock()
 	defer std.mu.Unlock()
 
@@ -39,7 +53,7 @@ func Q(v ...interface{}) {
 	}()
 
 	args := formatArgs(v...)
-	funcName, file, line, err := getCallerInfo()
+	funcName, file, line, err := getCallerInfo(callDepth)
 	if err != nil {
 		std.output(args...) // no name=value printing
 		return

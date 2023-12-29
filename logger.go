@@ -28,7 +28,7 @@ const (
 	maxLineWidth = 80
 )
 
-// logger writes pretty logs to the $TMPDIR/q file. It takes care of opening and
+// logger writes pretty logs to the $TMPDIR/$USER/q file. It takes care of opening and
 // closing the file. It is safe for concurrent use.
 type logger struct {
 	start     time.Time    // time of first write in the current log group

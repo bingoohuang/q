@@ -9,7 +9,7 @@ import (
 	"go/ast"
 	"testing"
 
-	"github.com/kr/pretty"
+	"github.com/bingoohuang/q/pretty"
 )
 
 // TestExtractingArgsFromSourceText verifies that exprToString() and argName()
