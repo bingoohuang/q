@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 	"sync"
@@ -52,12 +53,39 @@ func (l *logger) header(funcName, file string, line int) string {
 	l.lastFunc = funcName
 	l.lastFile = file
 
-	return fmt.Sprintf("[%s %d %s:%d %s]",
+	return fmt.Sprintf("[%s %s:%d %s]\n[PID: %d os.Args: %s]",
 		now.Format("2006-01-02T15:04:05.000"),
-		os.Getpid(),
-		shortFile(file), line, funcName)
+		shortFile(file), line, funcName,
+		os.Getpid(), QuoteCommand(os.Args))
 }
 
+var pattern = regexp.MustCompile(`[^\w@%+=:,./-]`)
+
+// Quote returns a shell-escaped version of the string s. The returned value
+// is a string that can safely be used as one token in a shell command line.
+func Quote(s string) string {
+	if len(s) == 0 {
+		return "''"
+	}
+
+	if pattern.MatchString(s) {
+		return "'" + strings.ReplaceAll(s, "'", "'\"'\"'") + "'"
+	}
+
+	return s
+}
+
+// QuoteCommand returns a shell-escaped version of the slice of strings.
+// The returned value is a string that can safely be used as shell command arguments.
+func QuoteCommand(args []string) string {
+	l := make([]string, len(args))
+
+	for i, s := range args {
+		l[i] = Quote(s)
+	}
+
+	return strings.Join(l, " ")
+}
 func (l *logger) shouldPrintHeader(funcName, file string) bool {
 	if file != l.lastFile {
 		return true
@@ -78,7 +106,7 @@ var path = func() string {
 	uid := os.Getuid()
 	str := strconv.Itoa(uid)
 	if u, _ := user.LookupId(str); u != nil {
-		return filepath.Join(os.TempDir(), u.Username+".q")
+		return filepath.Join(os.TempDir(), "q."+u.Username)
 	}
 
 	return filepath.Join(os.TempDir(), "q")
